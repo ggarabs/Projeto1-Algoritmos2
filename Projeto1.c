@@ -8,7 +8,7 @@
 #define TAM 6621
 #define WORDLEN 5
 
-int main() {
+int main(){
     FILE *arc;
     const char input_adress[] = "palavras.txt";
     bool right_lenght = false;
@@ -36,6 +36,9 @@ int main() {
     const int chances = 6;
     bool got_word = false;
     int n_attemps = 0;
+    clock_t start, end;
+
+    start = clock();
 
     for(int i = 1; i <= chances && !got_word; i++){
 
@@ -106,8 +109,12 @@ int main() {
         printf("\n");
     }
 
+    end = clock();
+
+    double play_time = ((double)start - (double)end)/CLOCKS_PER_SEC;
+
     FILE *output_arc;
-    const char output_adress[] = "palavras.txt";
+    const char output_adress[] = "scores.txt";
 
     if(!got_word){
         printf("VOCÊ PERDEU! Mais sorte da próxima vez!\n");
@@ -117,16 +124,14 @@ int main() {
 
         char player_name[MAXN];
         char std_space[] = "              ";
-        char line_recorded[10*MAXN];
 
         printf("Digite seu nome: ");
+        getchar();
         fgets(player_name, MAXN, stdin);
 
-        printf("%s", player_name);
-/*
         int tam = strlen(player_name);
         player_name[tam-1] = '\0';
-*/
+
         output_arc = fopen(output_adress, "a");
 
         if(NULL == output_arc){
@@ -134,15 +139,8 @@ int main() {
             return -1;
         }
 
-        char tent = (char)(n_attemps - '0');
+        fprintf(output_arc, "%s%s%s%s%d%s%d%s\n", player_name, std_space, drawn_word, std_space, n_attemps, std_space, play_time, std_space);
 
-        fprintf(output_arc, player_name);
-        fprintf(output_arc, std_space);
-        fprintf(output_arc, drawn_word);
-        fprintf(output_arc, std_space);
-/*        fprintf(output_arc, tent);
-        fprintf(output_arc, std_space);
-*/
         fclose(output_arc);
         
     }

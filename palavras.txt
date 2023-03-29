@@ -6618,7 +6618,4 @@ zulu
 zumbido
 zumbir
 zunir
-zunzum              ponte                            tanto              
-              bombo              
-              blusa              
-              frito              
+zunzum
