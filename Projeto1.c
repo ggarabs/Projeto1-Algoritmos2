@@ -3,31 +3,33 @@
 #include <time.h>
 #include <stdbool.h>
 #include <stdlib.h>
-
 #define MAXN 200
 #define TAM 6621
 #define WORDLEN 5
 #define CHANCES 6
 
-void word_search(FILE *archive, char link[], char word[]){
+void word_sort(FILE *archive, char link[], char word[]){
     bool right_lenght = false;
     srand(time(NULL));
 
     while (!right_lenght){
-        int random_number = rand() % TAM + 1;
+        int random_number = rand()%TAM + 1;
 
         archive = fopen(link, "r");
 
         if(NULL == archive){
             printf("Erro ao tentar abrir o arquivo.\n");
-            return;
+            return -1;
         }
 
         for (int i = 1; i <= random_number; i++) fscanf(archive, "%s", word);
 
         fclose(archive);
 
-        if(strlen(word) == WORDLEN) right_lenght = true;
+        if(strlen(word) == WORDLEN){
+            right_lenght = true;
+            strupr(word);
+        }
     }
     return 0;
 }
@@ -58,32 +60,30 @@ void data_validation(FILE *archive, char att[], char link[]){
         printf("\n");
 
     }while(!in_dic);
+    strupr(att);
 }
 
 void print_result(char word[], char attemp[]){
     printf("+-----------+\n| ");
 
     for(int j = 0; j < strlen(attemp); j++){
-        printf("%c ", toupper(attemp[j]));
+        printf("%c ", attemp[j]);
     }
 
     printf("|\n| ");
 
-    char ans[] = "xxxxx";
-    char old[] = "xxxxx";
+    char ans[] = "xxxxx", old[] = "xxxxx";
 
     for(int j = 0; j < WORDLEN; j++){
         if(attemp[j] == word[j]){
-            ans[j] = '^';
-            old[j] = '^';
+            ans[j] = old[j] = '^';
         }
     }
 
     for(int j = 0; j < WORDLEN; j++){
         for(int k = 0; k < WORDLEN; k++){
             if(ans[j] == 'x' && old[k] == 'x' && attemp[j] == word[k]){
-                ans[j] = '!';
-                old[k] = '!';
+                ans[j] = old[k] = '!';
             }
         }
     }
@@ -119,15 +119,13 @@ void finish_game(FILE *output_arc, char link[], char word[], int n_attemps, int 
     }else{
         printf("PARABÉNS! Você venceu!\n");
 
-        char player_name[MAXN];
-        char std_space[] = "              ";
+        char player_name[MAXN], std_space[] = "              ";
 
         printf("Digite seu nome: ");
         getchar();
         fgets(player_name, MAXN, stdin);
-
-        int tam = strlen(player_name);
-        player_name[tam-1] = '\0';
+        player_name[strlen(player_name)-1] = '\0';
+        strupr(player_name);
 
         output_arc = fopen(link, "a");
 
@@ -148,7 +146,7 @@ int main(){
     char drawn_word[MAXN];
     time_t start, end;
 
-    word_search(arc, input_adress, drawn_word);
+    word_sort(arc, input_adress, drawn_word);
 
     start = time(NULL);
 
