@@ -1,2 +1,4 @@
-Nome                Palavra             Tentativas                  Tempo
-jshdfbsjdhf              sexto              1              -12464H��X���H��X���
+Nome                Palavra             Tentativas          Tempo
+Gustavo               linho               2               -0.0016              
+hgvsdhgf               rumor               1               0.0016              
+shgdfvshgdf               turba               3               0.0053              

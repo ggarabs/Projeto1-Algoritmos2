@@ -36,9 +36,9 @@ int main(){
     const int chances = 6;
     bool got_word = false;
     int n_attemps = 0;
-    clock_t start, end;
+    time_t start, end;
 
-    start = clock();
+    start = time(NULL);
 
     for(int i = 1; i <= chances && !got_word; i++){
 
@@ -85,23 +85,27 @@ int main(){
 
         printf("|\n| ");
 
-        bool parcial[] = {0, 0, 0, 0, 0};
+        char ans[] = "xxxxx";
+        char old[] = "xxxxx";
 
         for(int j = 0; j < WORDLEN; j++){
-            bool in_word = false;
+            if(attemp[j] == drawn_word[j]){
+                ans[j] = '^';
+                old[j] = '^';
+            }
+        }
+
+        for(int j = 0; j < WORDLEN; j++){
             for(int k = 0; k < WORDLEN; k++){
-                if(!parcial[k] && attemp[j] == drawn_word[k]){
-                    in_word = true;
-                    if(j == k){
-                        printf("^ ");
-                        parcial[k] = true;
-                    }else{
-                        printf("! ");
-                    }
-                    break;
+                if(ans[j] == 'x' && old[k] == 'x' && attemp[j] == drawn_word[k]){
+                    ans[j] = '!';
+                    old[k] = '!';
                 }
             }
-            if(!in_word) printf("x ");
+        }
+
+        for(int j = 0; j < WORDLEN; j++){
+            printf("%c ", ans[j]);
         }
 
         printf("|\n+-----------+\n");
@@ -109,9 +113,9 @@ int main(){
         printf("\n");
     }
 
-    end = clock();
+    int play_time = time(NULL) - start;
 
-    double play_time = ((double)start - (double)end)/CLOCKS_PER_SEC;
+//    play_time = (double)play_time/CLOCKS_PER_SEC;
 
     FILE *output_arc;
     const char output_adress[] = "scores.txt";
@@ -139,7 +143,7 @@ int main(){
             return -1;
         }
 
-        fprintf(output_arc, "%s%s%s%s%d%s%d%s\n", player_name, std_space, drawn_word, std_space, n_attemps, std_space, play_time, std_space);
+        fprintf(output_arc, "%s%s %s%s %d%s %d%s\n", player_name, std_space, drawn_word, std_space, n_attemps, std_space, play_time, std_space);
 
         fclose(output_arc);
         
