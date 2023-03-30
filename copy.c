@@ -11,30 +11,7 @@
 int main(){
     FILE *arc;
     const char input_adress[] = "palavras.txt";
-    char drawn_word[MAXN];
-    bool right_lenght = false;
-
-    srand(time(NULL));
-
-    while (!right_lenght){
-        int random_number = rand() % TAM + 1;
-
-        arc = fopen(input_adress, "r");
-
-        if(NULL == arc) {
-            printf("Erro ao tentar abrir o arquivo.\n");
-            return -1;
-        }
-
-        for (int i = 1; i <= random_number; i++) fscanf(arc, "%s", drawn_word);
-
-        fclose(arc);
-
-        if(strlen(drawn_word) == WORDLEN) right_lenght = true;
-    }
-
-
-    recebe_entrada(arc, input_adress, drawn_word);
+    char drawn_word[] = "pasta";
 
     const int chances = 6;
     bool got_word = false;
@@ -52,29 +29,8 @@ int main(){
 
         bool in_dic = false;
 
-        do{
-            printf("Digite uma palavra de cinco letras: ");
-            scanf("%s", attemp);
-
-            char line[MAXN];
-
-            arc = fopen(input_adress, "r");
-
-            if(NULL == arc) {
-                printf("Erro ao tentar abrir o arquivo.\n");
-                return -1;
-            }
-
-            for (int i = 1; i <= TAM; i++){
-                fscanf(arc, "%s", line);
-                if(strcmp(line, attemp) == 0 && strlen(attemp) == WORDLEN) in_dic = true;
-            }
-
-            if(!in_dic) printf("Palavra de tamanho inválido ou não encontrada na base de dados.\n");
-
-            printf("\n");
-
-        }while(!in_dic);
+        printf("Digite uma palavra de cinco letras: ");
+        scanf("%s", attemp);
 
         if(strcmp(attemp, drawn_word) == 0){
             got_word = true;

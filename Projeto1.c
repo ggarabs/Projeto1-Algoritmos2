@@ -1,81 +1,72 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
-#include <stdbool.h>
 #include <time.h>
+#include <stdbool.h>
+#include <stdlib.h>
 
 #define MAXN 200
 #define TAM 6621
 #define WORDLEN 5
+#define CHANCES 6
 
-int main(){
-    FILE *arc;
-    const char input_adress[] = "palavras.txt";
+void word_search(FILE *archive, char link[], char word[]){
     bool right_lenght = false;
-    char drawn_word[MAXN];
 
     srand(time(NULL));
 
-    while (!right_lenght) {
+    while (!right_lenght){
         int random_number = rand() % TAM + 1;
 
-        arc = fopen(input_adress, "r");
+        archive = fopen(link, "r");
 
-        if(NULL == arc) {
+        if(NULL == archive) {
             printf("Erro ao tentar abrir o arquivo.\n");
             return -1;
         }
 
-        for (int i = 1; i <= random_number; i++) fscanf(arc, "%s", drawn_word);
+        for (int i = 1; i <= random_number; i++) fscanf(archive, "%s", word);
 
-        fclose(arc);
+        fclose(archive);
 
-        if(strlen(drawn_word) == WORDLEN) right_lenght = true;
+        if(strlen(word) == WORDLEN) right_lenght = true;
     }
+}
 
-    const int chances = 6;
-    bool got_word = false;
-    int n_attemps = 0;
-    time_t start, end;
+void data_validation(FILE *archive, char att[], char link[]){
+    bool in_dic = false;
 
-    start = time(NULL);
+    do{
+        printf("Digite uma palavra de cinco letras: ");
+        scanf("%s", att);
 
-    for(int i = 1; i <= chances && !got_word; i++){
+        char line[MAXN];
 
-        printf("%dª Tentativa\n%s\n", i, drawn_word);
+        archive = fopen(link, "r");
+
+        if(NULL == archive) {
+            printf("Erro ao tentar abrir o arquivo.\n");
+                return -1;
+        }
+
+        for (int i = 1; i <= TAM; i++){
+            fscanf(archive, "%s", line);
+            if(strcmp(line, att) == 0 && strlen(att) == WORDLEN) in_dic = true;
+        }
+
+        if(!in_dic) printf("Palavra de tamanho inválido ou não encontrada na base de dados.\n");
+
+        printf("\n");
+
+    }while(!in_dic);
+}
+
+int make_attemp(FILE *archive, char link[], char word[]){
+    for(int i = 1; i <= CHANCES; i++){
+        printf("%dª Tentativa\n", i);
 
         char attemp[MAXN];
-        n_attemps++;
 
-        bool in_dic = false;
-
-        do{
-            printf("Digite uma palavra de cinco letras: ");
-            scanf("%s", attemp);
-
-            char line[MAXN];
-
-            arc = fopen(input_adress, "r");
-
-            if(NULL == arc) {
-                printf("Erro ao tentar abrir o arquivo.\n");
-                return -1;
-            }
-
-            for (int i = 1; i <= TAM; i++){
-                fscanf(arc, "%s", line);
-                if(strcmp(line, attemp) == 0 && strlen(attemp) == WORDLEN) in_dic = true;
-            }
-
-            if(!in_dic) printf("Palavra de tamanho inválido ou não encontrada na base de dados.\n");
-
-            printf("\n");
-
-        }while(!in_dic);
-
-        if(strcmp(attemp, drawn_word) == 0){
-            got_word = true;
-        }
+        data_validation(archive, attemp, link);
 
         printf("+-----------+\n| ");
 
@@ -89,7 +80,7 @@ int main(){
         char old[] = "xxxxx";
 
         for(int j = 0; j < WORDLEN; j++){
-            if(attemp[j] == drawn_word[j]){
+            if(attemp[j] == word[j]){
                 ans[j] = '^';
                 old[j] = '^';
             }
@@ -97,7 +88,7 @@ int main(){
 
         for(int j = 0; j < WORDLEN; j++){
             for(int k = 0; k < WORDLEN; k++){
-                if(ans[j] == 'x' && old[k] == 'x' && attemp[j] == drawn_word[k]){
+                if(ans[j] == 'x' && old[k] == 'x' && attemp[j] == word[k]){
                     ans[j] = '!';
                     old[k] = '!';
                 }
@@ -108,21 +99,20 @@ int main(){
             printf("%c ", ans[j]);
         }
 
-        printf("|\n+-----------+\n");
+        printf("|\n+-----------+\n\n");
 
-        printf("\n");
+        if(strcmp(attemp, word) == 0){
+            return i;
+        }
     }
+    return 0;
+}
 
-    int play_time = time(NULL) - start;
-
-//    play_time = (double)play_time/CLOCKS_PER_SEC;
-
-    FILE *output_arc;
-    const char output_adress[] = "scores.txt";
-
-    if(!got_word){
+void finish_game(FILE *output_arc, char link[], char word[], int n_attemps, int time){
+    bool win = n_attemps > 0;
+    if(!win){
         printf("VOCÊ PERDEU! Mais sorte da próxima vez!\n");
-        printf("A palavra sorteada foi: %s\n\n", drawn_word);
+        printf("A palavra sorteada foi: %s\n\n", word);
     }else{
         printf("PARABÉNS! Você venceu!\n");
 
@@ -136,19 +126,38 @@ int main(){
         int tam = strlen(player_name);
         player_name[tam-1] = '\0';
 
-        output_arc = fopen(output_adress, "a");
+        output_arc = fopen(link, "a");
 
         if(NULL == output_arc){
             printf("Erro ao tentar abrir o arquivo!");
             return -1;
         }
 
-        fprintf(output_arc, "%s%s %s%s %d%s %d%s\n", player_name, std_space, drawn_word, std_space, n_attemps, std_space, play_time, std_space);
+        fprintf(output_arc, "%s%s %s%s %d%s %d%s\n", player_name, std_space, word, std_space, n_attemps, std_space, time, std_space);
 
         fclose(output_arc);
-        
     }
+}
+
+int main(){
+    FILE *arc;
+    const char input_adress[] = "palavras.txt";
+    char drawn_word[MAXN];
+
+    word_search(arc, input_adress, drawn_word);
+
+    time_t start, end;
+
+    start = time(NULL);
+
+    int got_word = make_attemp(arc, input_adress, drawn_word);
+
+    int play_time = time(NULL) - start;
+
+    FILE *output_arc;
+    const char output_adress[] = "scores.txt";
+
+    finish_game(output_arc, output_adress, drawn_word, got_word, play_time);
 
     return 0;
-
 }
