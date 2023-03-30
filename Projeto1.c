@@ -11,7 +11,6 @@
 
 void word_search(FILE *archive, char link[], char word[]){
     bool right_lenght = false;
-
     srand(time(NULL));
 
     while (!right_lenght){
@@ -19,9 +18,9 @@ void word_search(FILE *archive, char link[], char word[]){
 
         archive = fopen(link, "r");
 
-        if(NULL == archive) {
+        if(NULL == archive){
             printf("Erro ao tentar abrir o arquivo.\n");
-            return -1;
+            return;
         }
 
         for (int i = 1; i <= random_number; i++) fscanf(archive, "%s", word);
@@ -30,6 +29,7 @@ void word_search(FILE *archive, char link[], char word[]){
 
         if(strlen(word) == WORDLEN) right_lenght = true;
     }
+    return 0;
 }
 
 void data_validation(FILE *archive, char att[], char link[]){
@@ -45,7 +45,7 @@ void data_validation(FILE *archive, char att[], char link[]){
 
         if(NULL == archive) {
             printf("Erro ao tentar abrir o arquivo.\n");
-                return -1;
+            return -1;
         }
 
         for (int i = 1; i <= TAM; i++){
@@ -60,46 +60,49 @@ void data_validation(FILE *archive, char att[], char link[]){
     }while(!in_dic);
 }
 
+void print_result(char word[], char attemp[]){
+    printf("+-----------+\n| ");
+
+    for(int j = 0; j < strlen(attemp); j++){
+        printf("%c ", toupper(attemp[j]));
+    }
+
+    printf("|\n| ");
+
+    char ans[] = "xxxxx";
+    char old[] = "xxxxx";
+
+    for(int j = 0; j < WORDLEN; j++){
+        if(attemp[j] == word[j]){
+            ans[j] = '^';
+            old[j] = '^';
+        }
+    }
+
+    for(int j = 0; j < WORDLEN; j++){
+        for(int k = 0; k < WORDLEN; k++){
+            if(ans[j] == 'x' && old[k] == 'x' && attemp[j] == word[k]){
+                ans[j] = '!';
+                old[k] = '!';
+            }
+        }
+    }
+
+    for(int j = 0; j < WORDLEN; j++){
+        printf("%c ", ans[j]);
+    }
+
+    printf("|\n+-----------+\n\n");
+}
+
 int make_attemp(FILE *archive, char link[], char word[]){
     for(int i = 1; i <= CHANCES; i++){
         printf("%dª Tentativa\n", i);
-
         char attemp[MAXN];
 
         data_validation(archive, attemp, link);
 
-        printf("+-----------+\n| ");
-
-        for(int j = 0; j < strlen(attemp); j++){
-            printf("%c ", toupper(attemp[j]));
-        }
-
-        printf("|\n| ");
-
-        char ans[] = "xxxxx";
-        char old[] = "xxxxx";
-
-        for(int j = 0; j < WORDLEN; j++){
-            if(attemp[j] == word[j]){
-                ans[j] = '^';
-                old[j] = '^';
-            }
-        }
-
-        for(int j = 0; j < WORDLEN; j++){
-            for(int k = 0; k < WORDLEN; k++){
-                if(ans[j] == 'x' && old[k] == 'x' && attemp[j] == word[k]){
-                    ans[j] = '!';
-                    old[k] = '!';
-                }
-            }
-        }
-
-        for(int j = 0; j < WORDLEN; j++){
-            printf("%c ", ans[j]);
-        }
-
-        printf("|\n+-----------+\n\n");
+        print_result(word, attemp);
 
         if(strcmp(attemp, word) == 0){
             return i;
@@ -140,22 +143,18 @@ void finish_game(FILE *output_arc, char link[], char word[], int n_attemps, int 
 }
 
 int main(){
-    FILE *arc;
-    const char input_adress[] = "palavras.txt";
+    FILE *arc, *output_arc;
+    const char input_adress[] = "palavras.txt", output_adress[] = "scores.txt";
     char drawn_word[MAXN];
+    time_t start, end;
 
     word_search(arc, input_adress, drawn_word);
-
-    time_t start, end;
 
     start = time(NULL);
 
     int got_word = make_attemp(arc, input_adress, drawn_word);
 
     int play_time = time(NULL) - start;
-
-    FILE *output_arc;
-    const char output_adress[] = "scores.txt";
 
     finish_game(output_arc, output_adress, drawn_word, got_word, play_time);
 

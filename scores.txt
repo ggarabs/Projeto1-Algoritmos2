@@ -10,3 +10,5 @@ Djikstra               cairo               3               35
 Rodrigo               ninar               0               113              
 Francis Coppola               casal               0               99              
 Margaret               farda               3               18              
+Bruce Benner               vesgo               4               84              
+Marie Curie               longe               4               28              
